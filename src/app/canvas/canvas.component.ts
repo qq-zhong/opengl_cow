@@ -24,7 +24,30 @@ declare var perspective: any;
 })
 export class CanvasComponent {
 
-  message: string = 'Hello World!';
+  message: string = 'Use your mouse to rotate the cow!';
+
+  diffuse_value: number = 50; // Initial value
+  specular_value: number = 50; // Initial value
+  spotlight_value: number = 50; 
+  ambient_value: number = 25; 
+  selectedColor: string = '#ff0000';
+  color_array = this.getRGBComponents(this.selectedColor);
+  selected_red = this.getRGBComponents(this.selectedColor)[0];
+
+
+  updateValue(event: any): void {
+    //this.diffuse_value = event.target.value;
+    // console.log(this.getRGBComponents(this.selectedColor));
+    // console.log("Hello World");
+  }
+
+  colorChanged(){
+    // console.log(this.getRGBComponents(this.selectedColor));
+    // this.selected_red = this.getRGBComponents(this.selectedColor)[0];
+    this.color_array = this.getRGBComponents(this.selectedColor);
+    // console.log(this.color_array);
+  }
+
 
   constructor() { }
 
@@ -8898,12 +8921,17 @@ export class CanvasComponent {
     uniform mat4 uProjection;
     uniform vec3 uLightPosition;
     uniform vec3 uCameraPosition;
+    uniform vec3 c_color;
 
     uniform vec3 sLightPosition;
     uniform vec3 sLightDirection;
     uniform float lightInnerCutoff;
     uniform float lightOuterCutoff;
+    uniform float brightness1;
+    uniform float brightness2;
 
+    uniform float brightness3;
+    uniform float ambBrightness;
 
 
     //vec3 lightDirection = normalize(vec3(1.0,1.0,1.0));
@@ -8915,6 +8943,8 @@ export class CanvasComponent {
     out float vBrightness;
     out float vvBrightness;
     out float sBrightness;
+    out float aBrightness;
+    out vec4 cowColor;
 
     void main()
     {
@@ -8949,9 +8979,11 @@ export class CanvasComponent {
         gl_Position = uProjection * uView * uModel * aPosition;
         //vBrightness = 1.0;
 
-        vBrightness = 1.0*max(dot(lVector, bNormal), 0.0) ;
-        vvBrightness = + 1.0*spotDiffuse*pow(spotLight,5.0); // .8 and 2
-        sBrightness = 1.0*pow(max(0.0,(dot(viewVector, rVector))),20.0)  + 4.0*pow(spotLight,10.0)*pow(max(0.0,(dot(viewVector, rVector2))),40.0); // 1.5
+        vBrightness = brightness1 * 1.0*max(dot(lVector, bNormal), 0.0) ;
+        vvBrightness = + 1.0*spotDiffuse*pow(spotLight,5.0) * brightness3; // .8 and 2
+        sBrightness = brightness2 * 1.0*pow(max(0.0,(dot(viewVector, rVector))),20.0)  + brightness2 * 4.0*pow(spotLight,10.0)*pow(max(0.0,(dot(viewVector, rVector2))),40.0); // 1.5
+        cowColor = vec4(c_color, 1.0);
+        aBrightness = ambBrightness;
     }`;
 
     const fragmentShaderSrc = `#version 300 es
@@ -8962,16 +8994,20 @@ export class CanvasComponent {
     in float vBrightness;
     in float sBrightness;
     in float vvBrightness;
+    in float aBrightness;
+    in vec4 cowColor;
 
     out vec4 fragColor;
 
-    vec4 color =  vec4(0.6, 0.25, 0.0, 1.0); 
+    // vec4 color =  vec4(0.6, 0.25, 0.0, 1.0); 
+    // vec4 color = cowColor;
     vec4 green = vec4(0.1, 0.6, 0.4, 1.0);
     vec4 white = vec4(1.0,1.0,1.0,1.0);
 
     void main()
     {
-        fragColor = (0.4 * color) + (0.8 *color * vBrightness) + white * sBrightness + green * vvBrightness;
+        // fragColor = (0.4 * color) + (0.8 *color * vBrightness) + white * sBrightness + green * vvBrightness;
+        fragColor = (aBrightness * 0.4 * cowColor) + (0.8 *cowColor * vBrightness) + white * sBrightness + green * vvBrightness;
         fragColor.a = 1.0;
         //fragColor = vec4(1.0, 0.0, 0.0, 1.0);
     }`;
@@ -9084,6 +9120,12 @@ export class CanvasComponent {
     const sLightDirection = gl.getUniformLocation(program, 'sLightDirection');
     const LICLoc = gl.getUniformLocation(program, 'lightInnerCutoff'); //float
     const LOCLoc = gl.getUniformLocation(program, 'lightOuterCutoff'); 
+    const brightness1 = gl.getUniformLocation(program, 'brightness1'); 
+    const brightness2 = gl.getUniformLocation(program, 'brightness2'); 
+    const brightness3 = gl.getUniformLocation(program, 'brightness3'); 
+    const aBrightness = gl.getUniformLocation(program, 'ambBrightness'); 
+    const cow_color = gl.getUniformLocation(program, 'c_color');
+
 
     const matrix = [
         1.0, 0.0, 0.0, 0.0,
@@ -9105,6 +9147,8 @@ export class CanvasComponent {
     var view = matrix;
     var projection = matrix;
     var camera = vec3(0,0,40);
+    var camera_distance = 30;
+    camera = vec3(0,0,30);
 
 
 
@@ -9239,6 +9283,15 @@ export class CanvasComponent {
         //////////////////////////////////
         gl.uniform1f(LICLoc, Math.cos(0.0));
         gl.uniform1f(LOCLoc, Math.cos(Math.PI/10));
+        gl.uniform1f(brightness1, 2 * this.diffuse_value/100);
+        gl.uniform1f(brightness2, 2 * this.specular_value/100);
+        gl.uniform1f(brightness3, 2 *this.spotlight_value/100);
+        gl.uniform1f(aBrightness, 2 *this.ambient_value/100);
+        gl.uniform3fv(uCameraPosition, flatten(camera));
+
+        // gl.uniform3fv(cow_color, flatten(vec3(1.0,0.0,0.0)));
+        gl.uniform3fv(cow_color, flatten(vec3(this.color_array[0]/255,this.color_array[1]/255,this.color_array[2]/255)));
+
 
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(flatten(augmented_result)), gl.STATIC_DRAW);
         gl.drawElements(gl.TRIANGLES, faces.length, gl.UNSIGNED_SHORT, 0);
@@ -9285,14 +9338,14 @@ export class CanvasComponent {
         if (mouseIsDown){
           
           switch(mouseCount){
-            case 0: //translate
+            case 2: //translate
               deltaX = event.x - startX;
               deltaY = event.y - startY;
               //model = mult(temp_model,translate(-deltaX*scale_v,deltaY*scale_v,0));
               model = mult(translate(-deltaX*scale_v, deltaY*scale_v,0), temp_model);
               translateM = mult(translate(-deltaX*scale_v, deltaY*scale_v,0), temp_translate);
               break;
-            case 2: //rotate
+            case 0: //rotate
               deltaX = event.x - startX;
               deltaY = event.y - startY;
               //model = mult(mult(temp_model, rotateZ(deltaY)),rotateY(deltaX));
@@ -9315,10 +9368,23 @@ export class CanvasComponent {
     addEventListener('keydown', ({key}) =>{
         //console.log(key);
         if (key == "ArrowUp"){
-          model = mult(translate(0,0,1), model);
+          // model = mult(translate(0,0,1), model);
+          // camera = vec3(mult(translate(0,0,-1), vec4(camera)));
+          // view = lookAt(vec3(camera), [0,0,0], [0,1,0]);
+          camera_distance --;
+          camera = vec3(0,0,camera_distance);
+          view = lookAt(camera,[0,0,0], [0,1,0]);
+          gl.uniformMatrix4fv(viewLoc, false, flatten(view));
+
         }
         if (key == "ArrowDown"){
-          model = mult(translate(0,0,-1), model);
+          // model = mult(translate(0,0,-1), model);
+          // camera = vec3(mult(translate(0,0,-1), vec4(camera)));
+          // view = lookAt(vec3(camera), [0,0,0], [0,1,0]);
+          camera_distance++;
+          camera = vec3(0,0,camera_distance);
+          view = lookAt(camera,[0,0,0], [0,1,0]);
+          gl.uniformMatrix4fv(viewLoc, false, flatten(view));
         }
         if (key == "ArrowLeft"){
           model = mult(rotateZ(1), model);
@@ -9357,5 +9423,18 @@ export class CanvasComponent {
 
     })
   }
+
+  getRGBComponents(color : string) {
+    if (color.length !== 7 || color[0] !== '#') {
+        throw new Error('Invalid color format, must be #RRGGBB');
+    }
+
+    // Extract each color component from the hex string
+    let r = parseInt(color.substr(1, 2), 16); // Extracts the RR part and converts to decimal
+    let g = parseInt(color.substr(3, 2), 16); // Extracts the GG part and converts to decimal
+    let b = parseInt(color.substr(5, 2), 16); // Extracts the BB part and converts to decimal
+
+    return [ r, g, b ];
+}
 
 }

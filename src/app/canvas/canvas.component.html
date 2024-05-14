@@ -7,7 +7,33 @@
         <canvas id="gl-canvas" width="512" height="512">>
             Oops ... your browser doesn't support the HTML5 canvas element
         </canvas>
+        <div>
+            <input type="range" min="0" max="100" [(ngModel)]="diffuse_value" (input)="updateValue($event)">
+            <p>Diffuse Lighting: {{ diffuse_value }}</p>
+        </div>
+        <div>
+            <input type="range" min="0" max="100" [(ngModel)]="specular_value" (input)="updateValue($event)">
+            <p>Specular Lighting: {{ specular_value }}</p>
+        </div>
+
+        <div>
+            <input type="range" min="0" max="100" [(ngModel)]="spotlight_value" (input)="updateValue($event)">
+            <p>Spot Light: {{ spotlight_value }}</p>
+        </div>
+
+        <div>
+            <input type="range" min="0" max="100" [(ngModel)]="ambient_value" (input)="updateValue($event)">
+            <p>Ambient Light: {{ ambient_value }}</p>
+        </div>
+        <div>
+            <input type="color" [(ngModel)]="selectedColor" (ngModelChange)="colorChanged()">
+            <!-- <p [style.color]="selectedColor">This text changes color! = {{selected_red}}</p> -->
+            <p>pick the cow's color!</p>
+          </div>
     </body>
+    <!-- src/app/slider/slider.component.html -->
+    
+  
     <!-- <script type="text/javascript" src="../Common/webgl-utils.js"></script>
     <script type="text/javascript" src="../Common/initShaders.js"></script>
     <script type="text/javascript" src="../Common/MV.js"></script> -->
