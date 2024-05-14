@@ -3,6 +3,9 @@
 use below line to build
 ng build --output-path docs --base-href /opengl_cow/
 
+see the cow in action:
+https://qq-zhong.github.io/opengl_cow/
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.9.
 
 ## Development server
