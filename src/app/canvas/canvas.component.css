@@ -1,3 +1,14 @@
 #gl-canvas {
     border: 2px solid #808080; /* 2px solid red border */
   }
+
+  .container {
+    display: flex; /* Enables flexbox */
+    align-items: flex-start; /* Aligns children (canvas and controls) to the top */
+}
+
+.controls {
+  display: flex;
+  flex-direction: column; /* Stacks children vertically */
+  margin-left: 20px; /* Adds some space between the canvas and the controls */
+}
