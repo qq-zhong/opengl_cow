@@ -12,3 +12,18 @@
   flex-direction: column; /* Stacks children vertically */
   margin-left: 20px; /* Adds some space between the canvas and the controls */
 }
+
+.slider-container {
+  display: flex;
+  align-items: center;
+  /* margin-bottom: 5px; */
+}
+
+.slider-label {
+  margin-left: 10px;
+}
+
+.instructions {
+  margin-top: 20px;
+  font-family: Arial, sans-serif;
+}

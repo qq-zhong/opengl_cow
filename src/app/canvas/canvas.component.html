@@ -1,37 +1,58 @@
-<p>{{message}}</p>
+
 <html>
-    <style>
-        canvas{ border: 1px solid #ccc;}
-    </style>
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <style>
+            canvas{ border: 1px solid #ccc;}
+        </style>
+    </head>
     <body class="container">
+        
         <canvas id="gl-canvas" width="512" height="512">>
             Oops ... your browser doesn't support the HTML5 canvas element
         </canvas>
         <div class="controls">
+            <!-- <p>{{message}}</p> -->
+            <br>
+            <div class="github-link">
+                <a href="https://github.com/qq-zhong/opengl_cow" target="_blank">View the GitHub repository here!</a>
+            </div>
+            <br>
+           
             
         
-            <div>
+            <div class="slider-container">
                 <input type="range" min="0" max="100" [(ngModel)]="diffuse_value" (input)="updateValue($event)">
-                <p>Diffuse Lighting: {{ diffuse_value }}</p>
+                <p class = "slider-label">Diffuse Lighting: {{ diffuse_value }}</p>
             </div>
-            <div>
+            <div class="slider-container">               
                 <input type="range" min="0" max="100" [(ngModel)]="specular_value" (input)="updateValue($event)">
-                <p>Specular Lighting: {{ specular_value }}</p>
+                <p class = "slider-label">Specular Lighting: {{ specular_value }}</p>
             </div>
 
-            <div>
-                <input type="range" min="0" max="100" [(ngModel)]="spotlight_value" (input)="updateValue($event)">
-                <p>Spot Light: {{ spotlight_value }}</p>
-            </div>
+            
 
-            <div>
+            <div class="slider-container">
                 <input type="range" min="0" max="100" [(ngModel)]="ambient_value" (input)="updateValue($event)">
-                <p>Ambient Light: {{ ambient_value }}</p>
+                <p class = "slider-label"> Ambient Light: {{ ambient_value }}</p>
             </div>
-            <div>
+
+            <div class="slider-container">
+                <input type="range" min="0" max="100" [(ngModel)]="spotlight_value" (input)="updateValue($event)">
+                <p class = "slider-label" >Spot Light Brightness: {{ spotlight_value }}</p>
+            </div>
+            <div class="slider-container">
                 <input type="color" [(ngModel)]="selectedColor" (ngModelChange)="colorChanged()">
                 <!-- <p [style.color]="selectedColor">This text changes color! = {{selected_red}}</p> -->
-                <p>pick the cow's color!</p>
+                <p class = "slider-label">pick the cow's color!</p>
+            </div>
+
+            <div class="instructions">
+                <h3>Control Instructions:</h3>
+                <p>Use your mouse to rotate the cow!</p>
+                <p><i class="fas fa-arrow-up"></i>   -  Zoom in</p>
+                <p><i class="fas fa-arrow-down"></i>   -  Zoom out</p>
+                <p><strong>R   </strong>-  Reset the view</p>
             </div>
         </div>
     </body>

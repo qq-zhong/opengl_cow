@@ -29,7 +29,7 @@ export class CanvasComponent {
   diffuse_value: number = 50; // Initial value
   specular_value: number = 50; // Initial value
   spotlight_value: number = 50; 
-  ambient_value: number = 25; 
+  ambient_value: number = 10; 
   selectedColor: string = '#ff0000';
   color_array = this.getRGBComponents(this.selectedColor);
   selected_red = this.getRGBComponents(this.selectedColor)[0];
@@ -9002,6 +9002,7 @@ export class CanvasComponent {
     // vec4 color =  vec4(0.6, 0.25, 0.0, 1.0); 
     // vec4 color = cowColor;
     vec4 green = vec4(0.1, 0.6, 0.4, 1.0);
+    // vec4 green = vec4(0.6, 0.4, 0.1, 1.0); // spotlight color used to be green
     vec4 white = vec4(1.0,1.0,1.0,1.0);
 
     void main()
